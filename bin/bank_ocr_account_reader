@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require "bank_ocr_kata"
+
+BankOcrKata::CLI.new(ARGV).call
