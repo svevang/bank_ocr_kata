@@ -26,10 +26,16 @@ RSpec.describe BankOcrKata::Digits do
   "|_||_||_||_||_||_||_||_||_|"
   end
 
-  let (:digits_through_ten) do
+  let (:digits_through_nine) do
   "    _  _     _  _  _  _  _ \n" +
   "  | _| _||_||_ |_   ||_||_|\n" +
   "  ||_  _|  | _||_|  ||_| _|"
+  end
+
+  let (:all_digits) do
+  " _     _  _     _  _  _  _  _ \n" +
+  "| |  | _| _||_||_ |_   ||_||_|\n" +
+  "|_|  ||_  _|  | _||_|  ||_| _|"
   end
 
   context "#read" do
@@ -46,11 +52,11 @@ RSpec.describe BankOcrKata::Digits do
   context ".account_number" do
 
 
-    subject(:parsed_account) { BankOcrKata::Digits.account_number(digits_through_ten) }
+    subject(:parsed_account) { BankOcrKata::Digits.account_number(all_digits) }
 
     it { expect(parsed_account.class).to be Array }
 
-    it { expect(parsed_account).to all( be_an(Integer) ) }
+    it { binding.pry; expect(parsed_account).to all( be_an(Integer) ) }
 
   end
 end
