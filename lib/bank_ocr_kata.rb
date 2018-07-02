@@ -1,5 +1,11 @@
 require "bank_ocr_kata/version"
 
+# Reads multicharacter digit representations.
+
 module BankOcrKata
-  # Your code goes here...
+  module Digits
+    def self.read(path)
+      contents = File.read(path)
+    end
+  end
 end
