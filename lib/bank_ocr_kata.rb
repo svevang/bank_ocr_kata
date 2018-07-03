@@ -18,11 +18,23 @@ module BankOcrKata
       parse(@digit_string)
     end
 
+    def validation_string
+      acc = account_number
+        .map do |n|
+          if n.nil?
+            '?' if n.nil?
+          else
+            n.to_s
+          end
+      end
+        .join
+
+      acc = "#{acc} ILL" if account_number.any?(&:nil?)
+      acc
+    end
 
     def print
-      puts account_number
-        .map{|n| n.to_s }
-        .join
+      puts validation_string
     end
 
     def checksum_valid?

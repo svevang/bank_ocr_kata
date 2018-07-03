@@ -61,6 +61,24 @@ RSpec.describe BankOcrKata::Account do
     
   end
 
+  let(:use_cases3) do
+    [
+    " _  _  _  _  _  _  _  _    \n" +
+    "| || || || || || || ||_   |\n" +
+    "|_||_||_||_||_||_||_| _|  |",
+
+    "    _  _  _  _  _  _     _ \n" +
+    "|_||_|| || ||_   |  |  | _ \n" +
+    "  | _||_||_||_|  |  |  | _|",
+
+    "    _  _     _  _  _  _  _ \n" +
+    "  | _| _||_| _ |_   ||_||_|\n" +
+    "  ||_  _|  | _||_|  ||_| _ ",
+    ]
+
+  end
+
+
   context "Accounts" do
     context "#account_number" do
 
@@ -94,8 +112,20 @@ RSpec.describe BankOcrKata::Account do
       end
 
       it { expect(account_checksums).to contain_exactly(true)}
-
     end
+
+    context "validation_string" do
+      subject(:account_validation_strings) do
+        use_cases3
+          .map{ |digit_string| BankOcrKata::Account.new(digit_string) }
+          .map{ |account| account.validation_string }
+      end
+
+      it { expect(account_validation_strings).to contain_exactly("000000051",
+                                                                 "49006771? ILL",
+                                                                 "1234?678? ILL") }
+    end
+
 
   end
 
