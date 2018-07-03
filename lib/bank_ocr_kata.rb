@@ -24,6 +24,13 @@ module BankOcrKata
         .map{|n| n.to_s }
         .join
     end
+
+    def checksum_valid?
+      account_number
+        .reverse
+        .map.with_index { |digit, i| digit * (i+1) }
+        .reduce(:+) % 11 == 0
+    end
   end
 
 

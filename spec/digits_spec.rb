@@ -2,7 +2,6 @@ require "pry"
 
 RSpec.describe BankOcrKata::Digits do
 
-
   # an unprocessed file for accounts
   let(:digit_file_contents) do
   "    _  _     _  _  _  _  _ \n" +
