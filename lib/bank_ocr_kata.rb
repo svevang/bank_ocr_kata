@@ -10,12 +10,12 @@ module BankOcrKata
       @digit_string = digit_string
     end
 
-    def parse(digit_string)
-      BankOcrKata::Digits::parse(digit_string)
+    def parse(digit_string, consider_ambiguous)
+      BankOcrKata::Digits::parse(digit_string, consider_ambiguous)
     end
 
-    def account_number
-      parse(@digit_string)
+    def account_number(consider_ambiguous=false)
+      parse(@digit_string, consider_ambiguous)
     end
 
     def validation_string
@@ -77,18 +77,18 @@ module BankOcrKata
 
     # Takes in an individual account number of 9 digits in the ascii art
     # representation. There are 3 columns and 3 rows for each digit.
-    def self.parse(digit_string)
-      digit_string
+    def self.parse(digit_string, consider_ambiguous=false)
+      res = digit_string
         .split("\n")
         .map {|e| e.split('') }
         .transpose
         .each_slice(3)
         .to_a
         .map{ |split_hunks| split_hunks.transpose.map {|arr| arr.join("") } }
-        .map{ |hunks| lookup_digit(hunks.join) }
+        .map{ |hunks| lookup_digit(hunks.join, consider_ambiguous) }
     end
 
-    def self.lookup_digit(transposed_digit)
+    def self.lookup_digit(transposed_digit, consider_ambiguous)
       DIGITS.find_index(transposed_digit)
     end
 
