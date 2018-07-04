@@ -1,7 +1,6 @@
 require "pry"
 
 RSpec.describe BankOcrKata::Digits do
-
   # an unprocessed file for accounts
   let(:digit_file_contents) do
   "    _  _     _  _  _  _  _ \n" +
@@ -50,34 +49,30 @@ RSpec.describe BankOcrKata::Digits do
 
     subject(:parsed_digits) do
       BankOcrKata::Digits.read("digit_file_contents.txt")
-        .map{|account| account.account_number }
+                         .map(&:account_number)
     end
 
-    it { expect(parsed_digits.class).to be Array}
-    it { expect(parsed_digits.length).to be 3}
+    it { expect(parsed_digits.class).to be Array }
+    it { expect(parsed_digits.length).to be 3 }
 
     it "should parse a mockup of the reference file" do
-      expect(parsed_digits).to contain_exactly([1,2,3,4,5,6,7,8,9],
-                                               [1,2,3,4,5,6,7,8,9],
-                                               [0,0,0,0,0,0,0,0,0])
+      expect(parsed_digits).to contain_exactly([1, 2, 3, 4, 5, 6, 7, 8, 9],
+                                               [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                                               [0, 0, 0, 0, 0, 0, 0, 0, 0])
     end
   end
 
   context ".parse" do
-
-
     subject(:parsed_digits) { BankOcrKata::Digits.parse(all_digits) }
 
     it { expect(parsed_digits.class).to be Array }
 
-    it { expect(parsed_digits).to all( be_an(Integer) ) }
-
+    it { expect(parsed_digits).to all(be_an(Integer)) }
   end
 
   context ".reconstruct_ambiguous" do
     subject(:reconstructed_digits) { BankOcrKata::Digits.reconstruct_ambiguous(mangled_digit) }
     it { expect(reconstructed_digits.class).to be Array }
-    it { expect(reconstructed_digits).to contain_exactly([0,0,0,0,0,0,0,5,1]) }
-
+    it { expect(reconstructed_digits).to contain_exactly([0, 0, 0, 0, 0, 0, 0, 5, 1]) }
   end
 end

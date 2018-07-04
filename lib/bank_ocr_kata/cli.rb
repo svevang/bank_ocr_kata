@@ -7,7 +7,7 @@ module BankOcrKata
   class CLI
     attr_reader :argv
 
-    def self.default_options(argv = [])
+    def self.default_options(_argv = [])
       options = OpenStruct.new
       options
     end
@@ -32,7 +32,6 @@ module BankOcrKata
       options = CLI.default_options(argv)
 
       opt_parser = OptionParser.new do |opts|
-
         opts.banner = "Usage: bank_ocr_kata <account_number_file>"
 
         opts.separator ""
