@@ -23,20 +23,33 @@ module BankOcrKata
       alternatives = []
       acc = account_number
 
-      if reconstruct_ambiguous && account_number.any?(&:nil?)
+      if acc.any?(&:nil?)
         status = "ILL"
-        alternatives += BankOcrKata::Digits::reconstruct_ambiguous(@digit_string)
       end
 
-      if self.checksum_invalid? &&
-          alternatives.length == 1 &&
-          checksum_valid?(alternatives[0])
-        binding.pry
-        acc = alternatives[0]
-        alternatives = []
+      if reconstruct_ambiguous
+
+        if self.checksum_invalid?
+          status = "ILL"
+        end
+
+        unless status.nil?
+          alternatives = BankOcrKata::Digits::reconstruct_ambiguous(@digit_string)
+            .select{|digit_list| self.checksum_valid?(digit_list) }
+        end
+
+        if self.checksum_invalid? &&
+           alternatives.length == 1 &&
+           checksum_valid?(alternatives[0])
+          acc = alternatives[0]
+          alternatives = []
+          status = nil
+        end
+
       end
 
-      if alternatives.length > 1
+
+      if alternatives.length > 0
         status = "AMB"
       end
 
