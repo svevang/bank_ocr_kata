@@ -1,38 +1,64 @@
 # BankOcrKata
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/bank_ocr_kata`. To experiment with that code, run `bin/console` for an interactive prompt.
+This implements Bank OCR kata challange found over here:
+https://github.com/testdouble/contributing-tests/wiki/Bank-OCR-kata
 
-TODO: Delete this and the text above, and describe your gem
+## Quickstart
 
-## Installation
+To see this in action, either run the test suite
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'bank_ocr_kata'
+```
+ $ bundle exec rspec
 ```
 
-And then execute:
+or run the associated bin on the example text file:
 
-    $ bundle
+```
+±  |master ✗| → bundle exec bin/bank_ocr_account_reader example_digits.txt 
+111111111
+777777777
+200000000
+333333333
+888888888
+555555555
+666666666
+999999999
+490067715
+?23456789 ILL
+0?0000051 ILL
+49086771? ILL
+```
 
-Or install it yourself as:
+Note that the `-a` flag will try to recreate ambiguous account numbers:
 
-    $ gem install bank_ocr_kata
+```
+±  |master ✗| → bundle exec bin/bank_ocr_account_reader -a example_digits.txt 
+711111111
+777777177
+200800000
+333393333
+888888888 AMB [[8, 8, 8, 8, 8, 6, 8, 8, 8], [8, 8, 8, 8, 8, 8, 9, 8, 8],
+[8, 8, 8, 8, 8, 8, 8, 8, 0]]
+555555555 AMB [[5, 5, 9, 5, 5, 5, 5, 5, 5], [5, 5, 5, 6, 5, 5, 5, 5, 5]]
+666666666 AMB [[6, 8, 6, 6, 6, 6, 6, 6, 6], [6, 6, 6, 5, 6, 6, 6, 6, 6]]
+999999999 AMB [[8, 9, 9, 9, 9, 9, 9, 9, 9], [9, 9, 3, 9, 9, 9, 9, 9, 9],
+[9, 9, 9, 9, 5, 9, 9, 9, 9]]
+490067715 AMB [[4, 9, 0, 8, 6, 7, 7, 1, 5], [4, 9, 0, 0, 6, 7, 1, 1, 5],
+[4, 9, 0, 0, 6, 7, 7, 1, 9]]
+123456789
+000000051
+490867715
+```
 
-## Usage
+## Introduction to the code:
 
-TODO: Write usage instructions here
+Most of the code is in
+[lib/bank_ocr_kata.rb](https://github.com/svevang/bank_ocr_kata/blob/master/lib/bank_ocr_kata.rb). There you can find an `Account` class and a `Digits` module.
 
-## Development
+Accounts: keeps the relevant info for the account and calulates
+validation strings.
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/bank_ocr_kata. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Digits: A collection of utility methods, the "OCR" part of the code.
 
 ## License
 
