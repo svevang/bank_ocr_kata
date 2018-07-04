@@ -10,12 +10,12 @@ module BankOcrKata
       @digit_string = digit_string
     end
 
-    def parse(digit_string, consider_ambiguous)
-      BankOcrKata::Digits::parse(digit_string, consider_ambiguous)
+    def parse(digit_string)
+      BankOcrKata::Digits::parse(digit_string)
     end
 
-    def account_number(consider_ambiguous=false)
-      parse(@digit_string, consider_ambiguous)
+    def account_number
+      parse(@digit_string)
     end
 
     def ensure_valid_account_number(reconstruct_ambiguous)
@@ -48,7 +48,6 @@ module BankOcrKata
 
       end
 
-
       if alternatives.length > 0
         status = "AMB"
       end
@@ -80,9 +79,9 @@ module BankOcrKata
       puts validation_string(reconstruct_ambiguous)
     end
 
-    def checksum_valid?(acc=account_number)
-      return false if acc.any?(&:nil?)
-      acc
+    def checksum_valid?(acct=account_number)
+      return false if acct.any?(&:nil?)
+      acct
         .reverse
         .map.with_index { |digit, i| digit * (i+1) }
         .reduce(:+) % 11 == 0
@@ -136,7 +135,7 @@ module BankOcrKata
 
     # Takes in an individual account number of 9 digits in the ascii art
     # representation. There are 3 columns and 3 rows for each digit.
-    def self.parse(digit_string, consider_ambiguous=false)
+    def self.parse(digit_string)
       rotate(digit_string)
         .map{ |hunks| lookup_digit(hunks.join) }
     end
