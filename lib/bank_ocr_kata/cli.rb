@@ -20,8 +20,10 @@ module BankOcrKata
       options, file_path = parse(argv)
       return -1 unless valid?(options, file_path)
 
-      # TODO invoke the tool
-      account_numbers = BankOcrKata::Digits.read(file_path)
+      BankOcrKata::Digits.read(file_path).map do |account|
+        account.print(options[:reconstruct_ambiguous])
+      end
+
       0
     end
 
@@ -30,9 +32,14 @@ module BankOcrKata
       options = CLI.default_options(argv)
 
       opt_parser = OptionParser.new do |opts|
+
         opts.banner = "Usage: bank_ocr_kata <account_number_file>"
 
         opts.separator ""
+
+        opts.on("-a", "reconstruct ambiguous account numbers") do |a|
+          options[:reconstruct_ambiguous] = a
+        end
 
         opts.on_tail("-h", "--help", "Show this message") do |is_help|
           options.request_help = is_help

@@ -71,14 +71,13 @@ module BankOcrKata
       end
         .join
 
-
       formatted_acc = "#{formatted_acc} #{status} #{alternatives.inspect if alternatives.length > 0}".strip
 
       formatted_acc
     end
 
-    def print
-      puts validation_string
+    def print(reconstruct_ambiguous=false)
+      puts validation_string(reconstruct_ambiguous)
     end
 
     def checksum_valid?(acc=account_number)
@@ -114,13 +113,14 @@ module BankOcrKata
       delim = (" " * 27)
       contents = File.read(path)
 
-      # normalize the delimiter and remove the trailing whitespace
       # split the string and parse out digits
+      # take the 4 lines and discard the delimeter
       contents
-        .gsub("\n" + delim + "\n", delim)
-        .gsub("\n" + delim, "")
-        .split(delim)
-        .map{ |hunk_string| Account.new(hunk_string) }
+        .split("\n")
+        .each_slice(4)
+        .map{ |hunk_string| hunk_string[0..2] }
+        .map{ |hunk_string| hunk_string.join("\n") }
+        .map{ |digit_string| Account.new(digit_string) }
         .map{ |account| account }
     end
 
