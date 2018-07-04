@@ -37,6 +37,12 @@ RSpec.describe BankOcrKata::Digits do
   "|_|  ||_  _|  | _||_|  ||_| _|"
   end
 
+  let (:mangled_digit) do
+    " _     _  _  _  _  _  _    \n" +
+    "| || || || || || || ||_   |\n" +
+    "|_||_||_||_||_||_||_| _|  |"
+  end
+
   context "#read" do
     before do
       allow(File).to receive(:read).with("digit_file_contents.txt").and_return(digit_file_contents)
@@ -65,6 +71,13 @@ RSpec.describe BankOcrKata::Digits do
     it { expect(parsed_digits.class).to be Array }
 
     it { expect(parsed_digits).to all( be_an(Integer) ) }
+
+  end
+
+  context ".reconstruct_ambiguous" do
+    subject(:reconstructed_digits) { BankOcrKata::Digits.reconstruct_ambiguous(mangled_digit) }
+    it { expect(reconstructed_digits.class).to be Array }
+    it { expect(reconstructed_digits).to contain_exactly([0,0,0,0,0,0,0,5,1]) }
 
   end
 end

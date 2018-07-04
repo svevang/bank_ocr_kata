@@ -18,30 +18,66 @@ module BankOcrKata
       parse(@digit_string, consider_ambiguous)
     end
 
-    def validation_string
+    def ensure_valid_account_number(reconstruct_ambiguous)
+      status = nil
+      alternatives = []
       acc = account_number
+
+      if reconstruct_ambiguous && account_number.any?(&:nil?)
+        status = "ILL"
+        alternatives += BankOcrKata::Digits::reconstruct_ambiguous(@digit_string)
+      end
+
+      if self.checksum_invalid? &&
+          alternatives.length == 1 &&
+          checksum_valid?(alternatives[0])
+        binding.pry
+        acc = alternatives[0]
+        alternatives = []
+      end
+
+      if alternatives.length > 1
+        status = "AMB"
+      end
+
+      [acc, alternatives, status]
+
+    end
+
+    def validation_string(reconstruct_ambiguous=false)
+
+      acc, alternatives, status = ensure_valid_account_number(reconstruct_ambiguous)
+
+      formatted_acc = acc
         .map do |n|
           if n.nil?
-            '?' if n.nil?
+            '?'
           else
             n.to_s
           end
       end
         .join
 
-      acc = "#{acc} ILL" if account_number.any?(&:nil?)
-      acc
+
+      formatted_acc = "#{formatted_acc} #{status} #{alternatives.inspect if alternatives.length > 0}".strip
+
+      formatted_acc
     end
 
     def print
       puts validation_string
     end
 
-    def checksum_valid?
-      account_number
+    def checksum_valid?(acc=account_number)
+      return false if acc.any?(&:nil?)
+      acc
         .reverse
         .map.with_index { |digit, i| digit * (i+1) }
         .reduce(:+) % 11 == 0
+    end
+
+    def checksum_invalid?
+      !checksum_valid?
     end
   end
 
@@ -75,9 +111,7 @@ module BankOcrKata
         .map{ |account| account }
     end
 
-    # Takes in an individual account number of 9 digits in the ascii art
-    # representation. There are 3 columns and 3 rows for each digit.
-    def self.parse(digit_string, consider_ambiguous=false)
+    def self.rotate(digit_string)
       res = digit_string
         .split("\n")
         .map {|e| e.split('') }
@@ -85,11 +119,43 @@ module BankOcrKata
         .each_slice(3)
         .to_a
         .map{ |split_hunks| split_hunks.transpose.map {|arr| arr.join("") } }
-        .map{ |hunks| lookup_digit(hunks.join, consider_ambiguous) }
     end
 
-    def self.lookup_digit(transposed_digit, consider_ambiguous)
-      DIGITS.find_index(transposed_digit)
+    # Takes in an individual account number of 9 digits in the ascii art
+    # representation. There are 3 columns and 3 rows for each digit.
+    def self.parse(digit_string, consider_ambiguous=false)
+      rotate(digit_string)
+        .map{ |hunks| lookup_digit(hunks.join) }
+    end
+
+    def self.reconstruct_ambiguous(digit_string)
+      transposed_digit = rotate(digit_string)
+
+      try_char = ["_", "|", " "]
+
+      res = []
+
+      transposed_digit.each_with_index do |digit_frags, i|
+        digit_frags.each_with_index do |frag, j|
+          (0..(frag.length - 1)).each do |frag_index|
+            try_char.each do |try_char|
+              # deep copy the nested lists
+              trans_attempt = Marshal.load(Marshal.dump(transposed_digit))
+
+              trans_attempt[i][j][frag_index] = try_char
+
+              digit_value = trans_attempt.map {|hunks| lookup_digit(hunks.join) }
+              res.push(digit_value) unless digit_value.any?(&:nil?)
+            end
+          end
+        end
+      end
+
+      res
+    end
+
+    def self.lookup_digit(transposed_digit)
+      ind = DIGITS.find_index(transposed_digit)
     end
 
   end

@@ -180,11 +180,11 @@ RSpec.describe BankOcrKata::Account do
                                                                  "1234?678? ILL") }
     end
 
-    context "account numbers with ambiguous OCR" do
+    context "account numbers with ambiguous OCR and the `reconstruct_ambiguous` param" do
       subject(:account_validation_strings) do
         use_cases4
           .map{ |digit_string| BankOcrKata::Account.new(digit_string) }
-          .map{ |account| account.validation_string }
+          .map{ |account| account.validation_string(reconstruct_ambiguous=true) }
       end
 
       it { expect(account_validation_strings).to contain_exactly("0?0000051 ILL",
@@ -202,6 +202,7 @@ RSpec.describe BankOcrKata::Account do
                                                                 ) }
 
     end
+
   end
 
 end
